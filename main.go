@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mux"
 	"net/http"
 )
 
@@ -29,14 +30,20 @@ func allArticles(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func postArticles(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Test POST Endpoint worked")
+}
+
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Homepage Endpoint Hit")
 }
 
 func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/articles", allArticles)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter.HandleFunc("/", homePage)
+	myRouter.HandleFunc("/articles", allArticles).Methods("GET")
+	myRouter.HandleFunc("/articles", postArticles).Methods("POST")
+	log.Fatal(http.ListenAndServe(":8081", myRouter))
 }
 
 func main() {
